@@ -20,11 +20,8 @@ int main(int argc, char** argv)
 
 	std::string class_name[] = {"os", "architecture", "java", "algorithm", "digital-design"};
 
-    std::string::size_type sz;
     
-    std::string s = "123";
-    
-    read_file("../input/test");
+    read_file(class_name);
     
 	// Check the argument and print error message if the argument is wrong
 	/*

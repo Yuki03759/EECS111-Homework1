@@ -1,10 +1,10 @@
 #include "test.h"
 
-template <class Object>
+
 class Node{
     
     public:
-    Node (std::string theStudentID, std::string theGrade, Node<Object>* prevNode = NULL, Node<Object>* nextNode = NULL){
+    Node (std::string theStudentID, float theGrade, Node* prevNode = NULL, Node* nextNode = NULL){
         studentID = theStudentID;
         grade = theGrade;
         prev = prevNode;
@@ -18,35 +18,33 @@ class Node{
     std::string getStudentID(){
         return studentID;
     }
-    std::string getGrade(){
+    float getGrade(){
         return grade;
     }
-    Node<Object>* getPrev(){
+    Node* getPrev(){
         return prev;
     }
     
-    Node<Object>* getNext(){
+    Node* getNext(){
         return next;
     }
     
-    void setPrev(Node<Object>* prevNode){
+    void setPrev(Node* prevNode){
         prev = prevNode;
     }
     
-    void setNext(Node<Object>* nextNode){
+    void setNext(Node* nextNode){
         next = nextNode;
     }
     
     
     private:
-    Object key;
     std::string studentID;
-    std::string grade;
-    Node<Object>* prev;
-    Node<Object>* next;
+    float grade;
+    Node* prev;
+    Node* next;
 };
 
-template <class Object>
 class List{
     
     public:
@@ -58,23 +56,23 @@ class List{
         
     }
     
-    List<Object>* getFront(){
+    Node* getFront(){
         return front;
     }
     
-    List<Object>* getBack(){
+    Node* getBack(){
         return back;
     }
   
   
-    void printList(List<int>* l){
+    void printList(List* l){
         if(front == NULL){
             std::cout << "Empty List";
         }
         else{
             std::cout << "StudentID\tGrade " << std::endl;
             std::cout << "----------------------------------" << std::endl;
-            Node<Object>* currentNode = front;
+            Node* currentNode = front;
             while(currentNode != NULL){
                 std::cout << currentNode -> getStudentID() << '\t';
                 std::cout << currentNode -> getGrade() << std::endl;
@@ -83,8 +81,8 @@ class List{
         }
     }
   
-    void insert(std::string Student_ID, std::string Grade){
-        Node<Object>* newNode =  new Node<Object>(Student_ID, Grade, NULL, NULL);
+    void insert(std::string Student_ID, float Grade){
+        Node* newNode =  new Node(Student_ID, Grade, NULL, NULL);
         
         if(front == NULL){
             front = newNode;
@@ -98,17 +96,22 @@ class List{
     }
     
     private:
-    Node<Object>* front;
-    Node<Object>* back;
+    Node* front;
+    Node* back;
 };
 
-void read_file(std::string filename){
+void read_file(std::string class_name[]){
     
     std::ifstream ip;
+    std::string pos = "../input/small_";
+    std::string ext = ".csv";
+    std::string file = pos + class_name[0] + ext;
+    char* file1 = file.c_str();
+    //char* file1 = ( ( pos + "os" + ext ).c_str() );
     
-    ip.open("../input/small_os.csv", std::ifstream::in);
+    ip.open("../input/small_java.csv", std::ifstream::in);
     
-    List<int>* l = new List<int>();
+    List* l = new List();
     if(!ip.is_open()) 
         std::cout << "ERROR: File Open" << '\n';
     
@@ -120,10 +123,11 @@ void read_file(std::string filename){
     getline(ip, name1, ',');
     getline(ip, name2);
     
+    //int a = std::atoi(s.c_str());
     while(!ip.eof()){
         getline(ip, Student_ID, ',');
         getline(ip, Grade);
-        l -> insert( Student_ID, Grade );
+        l -> insert( Student_ID.c_str(), std::atof(Grade.c_str()) );
     }
     
     ip.close();

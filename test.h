@@ -13,7 +13,7 @@
 
 
 void testprint();
-void read_file(std::string filename);
+void read_file(std::string filename[]);
 void get_statistics(std::string class_name[]);
     
 
