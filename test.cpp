@@ -1,5 +1,5 @@
 #include "test.h"
-
+#include "p1_process.h"
 
 class Node{
     
@@ -100,13 +100,10 @@ class List{
     Node* back;
 };
 
-void read_file(std::string class_name[]){
+void read_file(std::string filename){
     
     std::ifstream ip;
-    std::string pos = "../input/small_";
-    std::string ext = ".csv";
-    std::string file = pos + class_name[0] + ext;
-    char* file1 = file.c_str();
+    
     //char* file1 = ( ( pos + "os" + ext ).c_str() );
     
     ip.open("../input/small_java.csv", std::ifstream::in);
@@ -123,22 +120,20 @@ void read_file(std::string class_name[]){
     getline(ip, name1, ',');
     getline(ip, name2);
     
-    //int a = std::atoi(s.c_str());
     while(!ip.eof()){
         getline(ip, Student_ID, ',');
         getline(ip, Grade);
-        l -> insert( Student_ID.c_str(), std::atof(Grade.c_str()) );
+        if(Student_ID != ""){
+            l -> insert( Student_ID.c_str(), std::atof(Grade.c_str()) );
+        }
     }
     
     ip.close();
     
     l -> printList(l);
-
-}
-
-void get_statistics(std::string class_name[]){
     
 }
+
 
 // This file includes functions that actually perform the
 // computation. You can create a thread with these function
