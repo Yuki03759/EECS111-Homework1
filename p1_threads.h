@@ -9,6 +9,7 @@
 
 #include "p1_process.h"
 
+using namespace std;
 
-
+void* runner(void* arg);
 #endif

@@ -14,3 +14,5 @@ ${EXEC}: main.o p1_process.o p1_threads.o
 clean:
 	rm -rf ./${EXEC}
 	rm -rf ./*.o
+	rm -rf ./../output/*.txt
+	rm -rf ./../output/*.csv

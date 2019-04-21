@@ -1,184 +1,160 @@
 #include "p1_process.h"
 #include "sys/wait.h"
-#include <vector>
 
-class Node{
-    
-    public:
-    Node (std::string theStudentID, float theGrade, Node* prevNode = NULL, Node* nextNode = NULL){
-        studentID = theStudentID;
-        grade = theGrade;
-        prev = prevNode;
-        next = nextNode;
-    }
-    
-    ~Node(){
-        prev = NULL;
-        next = NULL;
-    }
-    std::string getStudentID(){
-        return studentID;
-    }
-    float getGrade(){
-        return grade;
-    }
-    Node* getPrev(){
-        return prev;
-    }
-    
-    Node* getNext(){
-        return next;
-    }
-    
-    void setPrev(Node* prevNode){
-        prev = prevNode;
-    }
-    
-    void setNext(Node* nextNode){
-        next = nextNode;
-    }
-    
-    
-    private:
-    std::string studentID;
-    float grade;
-    Node* prev;
-    Node* next;
-};
+using namespace std;
 
-class List{
+void getResult(vector<Node> arr, string filename){
     
-    public:
-    List(){
-        front = NULL;
-        back = NULL;
-    }
-    ~List(){
-        
-    }
+    string file_place = "../output/" + filename + "_stats.csv";
+    const char* file = file_place.c_str();
+    ofstream ofs(file);
     
-    Node* getFront(){
-        return front;
-    }
+    double total, sd, mean, median;
+    double power = 2.0;
     
-    Node* getBack(){
-        return back;
+    for(int i = 0; i < arr.size(); i++){
+        total += arr[i].grade;
     }
-  
-  
-    void printList(List* l){
-        if(front == NULL){
-            std::cout << "Empty List";
-        }
-        else{
-            std::cout << "StudentID\tGrade " << std::endl;
-            std::cout << "----------------------------------" << std::endl;
-            Node* currentNode = front;
-            while(currentNode != NULL){
-                std::cout << currentNode -> getStudentID() << '\t';
-                std::cout << currentNode -> getGrade() << std::endl;
-                currentNode = currentNode -> getNext();
-            }
-        }
+   
+    mean = total/arr.size();
+    
+    if(arr.size() % 2 != 0)
+    { 
+        median = arr[arr.size()/2].grade; 
     }
-  
-    void insert(std::string Student_ID, float Grade){
-        Node* newNode =  new Node(Student_ID, Grade, NULL, NULL);
-        
-        if(front == NULL){
-            front = newNode;
-            back = newNode;
-        }
-        else{
-            back -> setNext(newNode);
-            back = newNode;
-        }
-        
+    else
+    {
+        median = ( arr[arr.size()/2].grade + arr[arr.size()/2+1].grade )/2;
     }
     
-    private:
-    Node* front;
-    Node* back;
-};
+    for(int i = 0; i < arr.size(); i++){
+        sd += pow( (arr[i].grade -  mean), power );
+    }
+    
+    sd = sqrt(sd/arr.size());
+   
+    ofs << "Average,Median,Std. Dev" << "\r\n";
+    ofs << fixed << setprecision(3) << mean << ","; 
+    ofs << fixed << setprecision(3) << median << ",";
+    ofs << fixed << setprecision(3) << sd;
+    
+    ofs.close();
+}
 
-void read_file(std::string filename){
+void print_vector(vector<Node> arr){
     
-    std::ifstream ip;
+    cout << "Rank\tStudent_ID\tGrade" << '\n';
+    cout << "-------------------------------" << '\n';
     
-    //char* file1 = ( ( pos + "os" + ext ).c_str() );
+    int count = 0;
     
-    ip.open("../input/small_os.csv", std::ifstream::in);
+    for(int i = 0; i < arr.size(); i++){
+        cout << ++count << '\t';
+        cout << arr[i].studentID << '\t';
+        cout << setprecision(12) << arr[i].grade << ' ';
+        cout << '\n';
+    }
+    cout << '\n';
+}
+
+void write_file(vector<Node> arr, string filename){
     
-    List* l = new List();
+   string file_place = "../output/" + filename + "_sorted.csv";
+   const char* file = file_place.c_str();
+   ofstream ofs(file);
+   
+   
+   int count = 0;
+   
+    ofs << "Rank,Student ID,Grade" << "\r\n";
     
-    if(!ip.is_open()) {
-        std::cout << "ERROR: File Open" << '\n';
-        return;
+    for(int i = 0; i < arr.size(); i++){
+        ofs << ++count << ',';
+        ofs << arr[i].studentID << ',';
+        ofs << setprecision(12) << arr[i].grade;
+        ofs << "\r\n";
+    }
+    ofs << "\r\n";
+   
+   ofs.close();
+}
+
+vector<Node> read_file(string filename){
+    
+    string file = "../input/" + filename + ".csv";
+    ifstream ifs(file.c_str());
+    
+    if(!ifs.is_open()) {
+        cout << "ERROR: File Open" << '\n';
+        exit(1);
     }
     
-    std::string Student_ID;
-    std::string Grade;
-    std::string name1;
-    std::string name2;
+    vector<Node> arr;
     
-    getline(ip, name1, ',');
-    getline(ip, name2);
+    string Student_ID;
+    string Grade;
+    double floatGrade;
     
-    while(!ip.eof()){
-        getline(ip, Student_ID, ',');
-        getline(ip, Grade);
+    getline(ifs, Student_ID);
+
+    while(!ifs.eof()){
+        getline(ifs, Student_ID, ',');
+        getline(ifs, Grade);
+        
         if(Student_ID != ""){
-            l -> insert( Student_ID.c_str(), std::atof(Grade.c_str()) );
+            Node info;
+            info.studentID = Student_ID;
+            floatGrade = atof(Grade.c_str());
+            info.grade = floatGrade;
+            arr.push_back(info);
         }
     }
     
-    ip.close();
+    ifs.close();    
     
-    //l -> printList(l);
-    
+    return arr;
 }
 
-void write_file(std::string filename){
+
+void get_statistics(string class_name[], int num_processes, int num_threads) {
     
-   std::string file_place = "../output/" + filename + ".txt";
-   const char* file_dump = file_place.c_str();
-   
-   std::ofstream dump(file_dump);
-   
-   dump << "dumping" << '\n';
-   
-   dump.close();
-   
-   
-}
-
-void get_statistics(std::string class_name[], int num_processes, int num_threads) {
-
-}
-
-//threading
-/*
-	if(num_processes >5)
+    if(num_processes >5)
         num_processes = 5;
-
+    
     int pid = 1;
- 
-    for(int i = 0; i <num_processes; i++){   
+    int i;
+    for(i = 0; i <num_processes; i++){   
         if (pid > 0)
             pid = fork();
+        else 
+            break;
     }
     
+    i--;
+    
+    vector<Node> answer[5];
+    
+    //thread id
+    
     if (pid == 0){
-        printf("child pid. (pid: %d)\n", getpid());
         
+        for (int j = 0; j< 5; j++)
+        {
+            if ( i == j % num_processes )
+            {    
+                printf("child #%d pid. (pid: %d) doing %s\n", i, getpid(), class_name[j].c_str());
+                vector<Node> arr = read_file(class_name[j]);
+                answer[j] = threadSort(arr, num_threads, class_name[j]);
+                write_file(answer[j], class_name[j]);
+                getResult(answer[j], class_name[j]);
+            }
+        }
         exit(0);
     }
-    else if (pid > 0){
-        
+    else if (pid > 0){  
         printf("parent process pid. (pid: %d)\n", getpid());
         for(int i=0; i < num_processes; i++){
             wait(NULL);
         }
     }
-*/  
-
+}
