@@ -5,7 +5,7 @@ using namespace std;
 
 void getResult(vector<Node> arr, string filename){
     
-    string file_place = "../output/" + filename + "_stats.csv";
+    string file_place = "./output/" + filename + "_stats.csv";
     const char* file = file_place.c_str();
     ofstream ofs(file);
     
@@ -59,7 +59,7 @@ void print_vector(vector<Node> arr){
 
 void write_file(vector<Node> arr, string filename){
     
-   string file_place = "../output/" + filename + "_sorted.csv";
+   string file_place = "./output/" + filename + "_sorted.csv";
    const char* file = file_place.c_str();
    ofstream ofs(file);
    
@@ -74,14 +74,13 @@ void write_file(vector<Node> arr, string filename){
         ofs << setprecision(12) << arr[i].grade;
         ofs << "\r\n";
     }
-    ofs << "\r\n";
    
    ofs.close();
 }
 
 vector<Node> read_file(string filename){
     
-    string file = "../input/" + filename + ".csv";
+    string file = "./input/" + filename + ".csv";
     ifstream ifs(file.c_str());
     
     if(!ifs.is_open()) {
@@ -142,7 +141,7 @@ void get_statistics(string class_name[], int num_processes, int num_threads) {
         {
             if ( i == j % num_processes )
             {    
-                printf("child #%d pid. (pid: %d) doing %s\n", i, getpid(), class_name[j].c_str());
+                printf("Child process is created. (pid: %d)\n", getpid());
                 vector<Node> arr = read_file(class_name[j]);
                 answer[j] = threadSort(arr, num_threads, class_name[j]);
                 write_file(answer[j], class_name[j]);
@@ -152,7 +151,6 @@ void get_statistics(string class_name[], int num_processes, int num_threads) {
         exit(0);
     }
     else if (pid > 0){  
-        printf("parent process pid. (pid: %d)\n", getpid());
         for(int i=0; i < num_processes; i++){
             wait(NULL);
         }

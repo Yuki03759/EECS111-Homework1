@@ -18,9 +18,7 @@ int main(int argc, char** argv)
 	int num_threads = 0;
 
 	string class_name[] = {"os", "architecture", "java", "algorithm", "digital-design"};
-    string small_name[] = {"small_os", "small_architecture", "small_java", 
-                            "small_algorithm", "small_digital-design"};
-                            
+           
     if(argc == 3 && (atoi(argv[1]) > 0 && atoi(argv[2]) > 0))
 	{
 		num_processes = atoi(argv[1]);

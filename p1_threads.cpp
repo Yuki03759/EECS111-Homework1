@@ -11,32 +11,33 @@
 
 using namespace std;
 
-int part = 0;
 vector<Node> V;
 
 vector<Node> merge(struct runner_struct* s){
     
     int index, theThread;
     int num_threads = s -> num_threads;
+    int Vsize = V.size();
+    
     //create arrThread based on num_thread
-    int arrThread[ num_threads ];
+    int arrThread[num_threads];
     for(int i = 0; i < num_threads; i++){
         arrThread[i] = s[i].start;
     }
     
+    //merge part
     vector<Node> ans;
-    for(int i = 0; i < V.size(); i++){
-        
+    
+    int i = 0;
+    while(i < Vsize){
         index = -1;
-
         for(int t = 0; t < num_threads; t++){
-            if( arrThread[t] != s[t].end+1){
+            if(arrThread[t] != s[t].end+1){
                 index = arrThread[t];
                 theThread = t;
                 break;
             }
         }
-        
         //final update
         for(int k = 0; k < num_threads; k++){
             if(arrThread[k] != s[k].end+1){
@@ -48,7 +49,8 @@ vector<Node> merge(struct runner_struct* s){
         }
         
         arrThread[theThread]++;
-        ans.push_back( V[ index ] );
+        ans.push_back(V[index]);
+        i++;
     }
     
     reverse(ans.begin(), ans.end());
@@ -73,12 +75,10 @@ vector<Node> threadSort(vector<Node> array, int num_threads, string filename){
     pthread_t tid[num_threads];
     
     for(int i = 0; i < num_threads; i++){
-        
         pthread_create(&tid[i], NULL, runner, &args[i]);
-     }
+    }
     
     for(int i = 0; i < num_threads; i++){
-        
         pthread_join(tid[i], NULL);
     }
     
